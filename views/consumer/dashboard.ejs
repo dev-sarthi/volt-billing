@@ -1,0 +1,92 @@
+<%- include('../partials/consumer-header') %>
+
+<div class="section-header">
+  <div class="meta">Good <%= new Date().getHours() < 12 ? 'Morning' : new Date().getHours() < 18 ? 'Afternoon' : 'Evening' %></div>
+  <h2>Here's your utility overview</h2>
+</div>
+
+<div class="bento-grid">
+
+  <!-- Main Current Bill Card -->
+  <% if (!latestBill) { %>
+    <div class="bento-card bento-bill" style="align-items: center; justify-content: center; text-align: center;">
+      <i data-lucide="check-circle" width="48" height="48" style="color: var(--status-success); margin-bottom: 1rem;"></i>
+      <h3 style="margin-bottom: 0.25rem;">You're all caught up!</h3>
+      <p class="text-muted">No bills generated yet.</p>
+    </div>
+  <% } else { %>
+    <div class="bento-card bento-bill bento-bill--<%= latestBill.status === 'paid' ? 'paid' : 'unpaid' %>">
+      <div class="bill-card__header">
+        <span class="bill-month">Bill for <%= latestBill.billingMonth %></span>
+        <% if (latestBill.status === 'paid') { %>
+          <span class="badge badge--success"><i data-lucide="check" width="12" height="12" style="margin-right:0.25rem;"></i> Paid on <%= new Date(latestBill.paidDate).toLocaleDateString() %></span>
+        <% } else if (latestBill.status === 'overdue') { %>
+          <span class="badge badge--danger"><i data-lucide="alert-circle" width="12" height="12" style="margin-right:0.25rem;"></i> Overdue</span>
+        <% } else { %>
+          <span class="badge badge--warning"><i data-lucide="clock" width="12" height="12" style="margin-right:0.25rem;"></i> Due Soon</span>
+        <% } %>
+      </div>
+
+      <div class="bill-card__amount">
+        <span class="currency">₹</span><%= latestBill.totalAmount %>
+      </div>
+      
+      <% if (latestBill.status !== 'paid') { %>
+        <div class="bill-card__due">
+          <i data-lucide="calendar" width="16" height="16"></i> Due on <%= new Date(latestBill.dueDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) %>
+        </div>
+      <% } else { %>
+        <div class="bill-card__due" style="color: var(--status-success);">
+          <i data-lucide="check-circle" width="16" height="16"></i> Account Settled
+        </div>
+      <% } %>
+
+      <div class="bill-card__actions" style="margin-top: 1.5rem;">
+        <a href="/consumer/bills/<%= latestBill._id %>" class="btn btn--outline">
+          <i data-lucide="file-text" width="18" height="18"></i> View Breakdown
+        </a>
+        <% if (latestBill.status !== 'paid') { %>
+          <form action="/consumer/bills/<%= latestBill._id %>/pay" method="POST" style="flex:1;">
+            <button type="submit" class="btn btn--primary btn--block">
+              Pay Now <i data-lucide="credit-card" width="18" height="18"></i>
+            </button>
+          </form>
+        <% } %>
+      </div>
+    </div>
+  <% } %>
+
+  <!-- Recent History List -->
+  <div class="bento-card bento-history">
+    <div class="section-title">
+      <i data-lucide="history" width="20" height="20"></i> Recent Bills
+    </div>
+    
+    <% if (!recentBills || recentBills.length === 0) { %>
+      <div class="empty" style="padding: 2rem;">
+        <i data-lucide="inbox" width="32" height="32" style="color: var(--border-color); margin-bottom: 0.5rem;"></i>
+        <p>No history available.</p>
+      </div>
+    <% } else { %>
+      <div class="history-list">
+        <% recentBills.forEach(bill => { %>
+          <a href="/consumer/bills/<%= bill._id %>" class="history-item">
+            <div class="history-item__left">
+              <div class="history-month"><%= bill.billingMonth %></div>
+              <div class="history-status">
+                <span class="badge badge--<%= bill.status === 'paid' ? 'success' : (bill.status === 'overdue' ? 'danger' : 'warning') %>"><%= bill.status %></span>
+              </div>
+            </div>
+            <div class="history-item__right">
+              <div class="history-amount">₹<%= bill.totalAmount %></div>
+              <div class="history-arrow"><i data-lucide="chevron-right" width="20" height="20"></i></div>
+            </div>
+          </a>
+        <% }) %>
+      </div>
+    <% } %>
+  </div>
+
+</div>
+
+<%- include('../partials/consumer-footer') %>

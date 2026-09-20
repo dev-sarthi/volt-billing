@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= typeof pageTitle !== 'undefined' ? pageTitle + ' — ' : '' %>VoltBilling</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/css/consumer.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+  <!-- Top bar (Glassmorphism) -->
+  <header class="topbar glass-panel">
+    <div class="topbar__brand">
+      <i data-lucide="droplet" width="20" height="20" style="color: var(--accent-blue);"></i>
+      <i data-lucide="zap" width="20" height="20" style="color: var(--accent-amber);"></i>
+      VoltBilling
+    </div>
+    <div class="topbar__right">
+      <span class="topbar__name">
+        <i data-lucide="user" width="16" height="16"></i>
+        <%= typeof currentUserName !== 'undefined' ? currentUserName : 'Consumer' %>
+      </span>
+      <form action="/logout" method="POST" class="topbar__logout-form">
+        <button type="submit" class="topbar__logout" title="Log Out">
+          <i data-lucide="log-out" width="18" height="18"></i>
+        </button>
+      </form>
+    </div>
+  </header>
+
+  <main class="page">
+    <!-- Main Navigation -->
+    <nav class="consumer-nav">
+      <a href="/consumer/dashboard" class="nav-link <%= activePage === 'dashboard' ? 'active' : '' %>">
+        <i data-lucide="layout-dashboard" width="18" height="18"></i> Dashboard
+      </a>
+      <a href="/consumer/bills" class="nav-link <%= activePage === 'bills' ? 'active' : '' %>">
+        <i data-lucide="file-text" width="18" height="18"></i> My Bills
+      </a>
+      <a href="/consumer/consumption" class="nav-link <%= activePage === 'consumption' ? 'active' : '' %>">
+        <i data-lucide="bar-chart-2" width="18" height="18"></i> Usage
+      </a>
+    </nav>
+
+    <%- include('../partials/flash') %>

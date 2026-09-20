@@ -1,0 +1,34 @@
+<%- include('../../partials/reader-header') %>
+
+<div class="confirm-card mt-1">
+  <div class="confirm-card__icon">
+    <i data-lucide="check" width="40" height="40"></i>
+  </div>
+  <div class="confirm-card__title">Reading Submitted</div>
+  
+  <div class="confirm-card__label">Units Consumed</div>
+  <div class="confirm-card__units"><%= reading.unitsConsumed %></div>
+  
+  <div class="confirm-card__details">
+    <div class="context-row">
+      <div class="context-row__label">Meter</div>
+      <div class="context-row__value" style="font-family: monospace; font-size: 1rem;"><%= meter.meterNumber %></div>
+    </div>
+    <div class="context-row">
+      <div class="context-row__label">Previous</div>
+      <div class="context-row__value"><%= reading.previousReading %></div>
+    </div>
+    <div class="context-row">
+      <div class="context-row__label">Current</div>
+      <div class="context-row__value"><%= reading.currentReading %></div>
+    </div>
+    <div class="context-row" style="margin-top: 1rem; border-top: 2px dashed var(--border-color); padding-top: 1rem;">
+      <div class="context-row__label">Bill Total Generated</div>
+      <div class="context-row__value" style="color: var(--accent-green); font-size: 1.15rem;">₹<%= bill.totalAmount %></div>
+    </div>
+  </div>
+
+  <a href="/reader/dashboard" class="btn btn--primary btn--block">Back to Dashboard</a>
+</div>
+
+<%- include('../../partials/reader-footer') %>

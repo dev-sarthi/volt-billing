@@ -1,0 +1,49 @@
+<%- include('../partials/reader-header') %>
+
+<div class="reader-nav">
+  <a href="/reader/dashboard" class="reader-nav__link reader-nav__link--active">
+    <i data-lucide="gauge" width="18" height="18"></i> Meters
+  </a>
+  <a href="/reader/readings" class="reader-nav__link">
+    <i data-lucide="history" width="18" height="18"></i> History
+  </a>
+</div>
+
+<div class="section-header">
+  <h2><i data-lucide="clipboard-list" width="24" height="24" style="color: var(--accent-blue);"></i> Pending Readings</h2>
+  <div class="meta"><i data-lucide="calendar" width="14" height="14" style="display: inline; vertical-align: -2px; margin-right: 2px;"></i> <%= billingMonth %></div>
+</div>
+
+<% if (meters.length === 0) { %>
+  <div class="empty">
+    <i data-lucide="check-circle-2" width="48" height="48" style="color: var(--accent-green); opacity: 0.5;"></i>
+    <p>All clear! No active meters need readings right now.</p>
+  </div>
+<% } else { %>
+  <div class="meter-list">
+    <% meters.forEach(m => { %>
+      <div class="meter-item">
+        <div class="meter-item__info">
+          <div class="meter-item__number"><%= m.meterNumber %></div>
+          <div class="meter-item__consumer">
+            <i data-lucide="user" width="14" height="14"></i>
+            <%= m.consumerId && m.consumerId.userId ? m.consumerId.userId.name : 'Unknown Consumer' %>
+          </div>
+        </div>
+        <div class="meter-item__action">
+          <% if (m.alreadyRead) { %>
+            <div class="btn btn--outline" style="pointer-events: none; color: var(--accent-green); border-color: var(--accent-green); background: #ecfdf5;">
+              <i data-lucide="check" width="16" height="16"></i> Done
+            </div>
+          <% } else { %>
+            <a href="/reader/readings/new?meterId=<%= m._id %>" class="btn btn--primary">
+              Read <i data-lucide="arrow-right" width="16" height="16"></i>
+            </a>
+          <% } %>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+<% } %>
+
+<%- include('../partials/reader-footer') %>

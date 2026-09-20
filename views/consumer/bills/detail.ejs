@@ -1,0 +1,58 @@
+<%- include('../../partials/consumer-header') %>
+
+<div class="section-header">
+  <a href="/consumer/bills" class="back-link"><i data-lucide="arrow-left" width="16" height="16"></i> Back to Bills</a>
+  <h2 style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="file-text" width="28" height="28"></i> Bill Details</h2>
+  <div class="meta"><%= bill.billingMonth %></div>
+</div>
+
+<div class="bento-card detail-card" style="max-width: 600px; margin: 0 auto;">
+  <div class="detail-header">
+    <div class="detail-header__status badge badge--<%= bill.status === 'paid' ? 'success' : (bill.status === 'overdue' ? 'danger' : 'warning') %>">
+      <%= bill.status %>
+    </div>
+    <div class="detail-header__due">
+      <% if (bill.status === 'paid') { %>
+        <i data-lucide="check-circle" width="16" height="16"></i> Paid on <%= new Date(bill.paidDate).toLocaleDateString() %>
+      <% } else { %>
+        <i data-lucide="calendar" width="16" height="16"></i> Due: <%= new Date(bill.dueDate).toLocaleDateString() %>
+      <% } %>
+    </div>
+  </div>
+
+  <div class="breakdown">
+    <div class="breakdown-row">
+      <div class="breakdown-label">Usage Charge (<%= bill.meterReadingId ? bill.meterReadingId.unitsConsumed : 0 %> units)</div>
+      <div class="breakdown-value">₹<%= bill.usageCharge %></div>
+    </div>
+    <div class="breakdown-row">
+      <div class="breakdown-label">Fixed Charge</div>
+      <div class="breakdown-value">₹<%= bill.fixedCharge %></div>
+    </div>
+    <% if (bill.surcharge && bill.surcharge > 0) { %>
+    <div class="breakdown-row" style="color: var(--status-danger);">
+      <div class="breakdown-label">Late Surcharge (2%)</div>
+      <div class="breakdown-value">₹<%= bill.surcharge %></div>
+    </div>
+    <% } %>
+    <div class="breakdown-row breakdown-row--total">
+      <div class="breakdown-label">Total Amount</div>
+      <div class="breakdown-value">₹<%= bill.totalAmount %></div>
+    </div>
+  </div>
+
+  <% if (bill.status !== 'paid') { %>
+    <form action="/consumer/bills/<%= bill._id %>/pay" method="POST" class="detail-action">
+      <button type="submit" class="btn btn--primary btn--block btn--lg">
+        Pay ₹<%= bill.totalAmount %> <i data-lucide="credit-card" width="20" height="20"></i>
+      </button>
+    </form>
+  <% } else { %>
+    <div class="detail-action" style="text-align: center; color: var(--status-success); font-weight: 600;">
+      <i data-lucide="check-circle" width="32" height="32" style="margin-bottom: 0.5rem;"></i>
+      <p>This bill has been paid.</p>
+    </div>
+  <% } %>
+</div>
+
+<%- include('../../partials/consumer-footer') %>

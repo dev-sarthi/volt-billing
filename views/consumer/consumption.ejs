@@ -1,0 +1,71 @@
+<%- include('../../partials/consumer-header') %>
+
+<div class="section-header">
+  <div class="meta">Analyze your usage patterns</div>
+  <h2 style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="bar-chart-2" width="28" height="28"></i> Usage History</h2>
+</div>
+
+<% if (!readings || readings.length === 0) { %>
+  <div class="empty">
+    <i data-lucide="bar-chart-2" width="48" height="48" style="color: var(--border-color); margin-bottom: 1rem;"></i>
+    No usage data found.
+  </div>
+<% } else { %>
+  <div class="bento-card usage-chart">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
+      <h3 style="margin-bottom: 0;">Monthly Consumption</h3>
+      <% const isWater = (readings[0] && readings[0].meterId && readings[0].meterId.utilityType === 'water'); %>
+      <div class="badge badge--<%= isWater ? 'water' : 'electricity' %>">
+        <i data-lucide="<%= isWater ? 'droplets' : 'zap' %>" width="12" height="12" style="margin-right: 0.25rem;"></i>
+        <%= isWater ? 'Water (KL)' : 'Electricity (kWh)' %>
+      </div>
+    </div>
+    <% 
+      // Simple CSS bar chart logic
+      const maxUnits = Math.max(...readings.map(r => r.unitsConsumed)) || 1;
+      const chartReadings = readings.slice(0, 12).reverse();
+    %>
+    
+    <div class="bars">
+      <% chartReadings.forEach(r => { 
+        const heightPct = Math.max(5, Math.round((r.unitsConsumed / maxUnits) * 100));
+      %>
+        <div class="bar-container" title="<%= r.billingMonth %>: <%= r.unitsConsumed %> units">
+          <div class="bar-value"><%= r.unitsConsumed %></div>
+          <div class="bar <%= isWater ? 'bar--water' : '' %>" style="height: <%= heightPct %>%"></div>
+          <div class="bar-label"><%= r.billingMonth.split('-')[1] %></div>
+        </div>
+      <% }) %>
+    </div>
+  </div>
+
+  <div class="bento-card list-card" style="margin-top: 2rem;">
+    <h3 style="margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+      <i data-lucide="list" width="20" height="20"></i> Raw Data
+    </h3>
+    <div style="overflow-x: auto;">
+      <table class="simple-table">
+        <thead>
+          <tr>
+            <th>Month</th>
+            <th>Previous</th>
+            <th>Current</th>
+            <th>Consumed</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% readings.forEach(r => { %>
+            <tr>
+              <td><%= r.billingMonth %></td>
+              <td style="color: var(--text-muted);"><%= r.previousReading %></td>
+              <td><%= r.currentReading %></td>
+              <td><strong><%= r.unitsConsumed %></strong></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+<% } %>
+
+<%- include('../../partials/consumer-footer') %>

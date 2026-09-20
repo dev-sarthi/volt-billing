@@ -1,0 +1,42 @@
+<%- include('../../partials/consumer-header') %>
+
+<div class="section-header">
+  <div class="meta">View your payment history</div>
+  <h2 style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="receipt" width="28" height="28"></i> All Bills</h2>
+</div>
+
+<% if (!bills || bills.length === 0) { %>
+  <div class="empty">
+    <i data-lucide="folder-open" width="48" height="48" style="color: var(--border-color); margin-bottom: 1rem;"></i>
+    No bills found in your history.
+  </div>
+<% } else { %>
+  <div class="bills-list">
+    <% bills.forEach(bill => { %>
+      <div class="bento-card list-card">
+        <div class="list-card__main">
+          <div class="list-card__month"><%= bill.billingMonth %></div>
+          <div class="list-card__amount" style="color: var(--text-main);">₹<%= bill.totalAmount %></div>
+        </div>
+        <div class="list-card__details">
+          <div class="list-card__units">
+            <i data-lucide="<%= bill.consumerId && bill.consumerId.utilityType === 'water' ? 'droplets' : 'zap' %>" width="14" height="14"></i>
+            <%= bill.meterReadingId ? bill.meterReadingId.unitsConsumed + ' units' : 'N/A' %>
+          </div>
+          <div style="margin-top: 0.5rem;">
+            <span class="badge badge--<%= bill.status === 'paid' ? 'success' : (bill.status === 'overdue' ? 'danger' : 'warning') %>">
+              <%= bill.status %>
+            </span>
+          </div>
+        </div>
+        <div class="list-card__action">
+          <a href="/consumer/bills/<%= bill._id %>" class="btn btn--outline btn--sm">
+            Details <i data-lucide="arrow-right" width="14" height="14"></i>
+          </a>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+<% } %>
+
+<%- include('../../partials/consumer-footer') %>

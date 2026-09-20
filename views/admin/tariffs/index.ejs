@@ -1,0 +1,192 @@
+<%- include('../../partials/admin-header') %>
+
+<div class="page-header">
+  <h2><i data-lucide="coins" width="32" height="32" style="color: var(--accent-amber); margin-right: 0.5rem;"></i> Tariff Plans</h2>
+</div>
+
+<% if (!plansToDisplay || plansToDisplay.every(p => p === null)) { %>
+  <div class="empty" style="text-align: center; padding: 4rem 2rem; color: var(--text-muted);">
+    <i data-lucide="inbox" width="48" height="48" style="margin-bottom: 1rem; opacity: 0.5;"></i><br>
+    No tariff plans found. Run the seed script to create default plans.
+  </div>
+<% } else { %>
+
+<div class="bento-grid">
+
+  <!-- ─── Plan Card ──────────────────────────────────────────────── -->
+  <% plansToDisplay.forEach((plan, idx) => { %>
+    <% if (plan) { %>
+      <div class="bento-card" style="grid-column: span 6;" id="plan-<%= plan._id %>">
+
+        <!-- Header -->
+        <div class="bento-card__title" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 1.5rem;">
+          <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <i data-lucide="<%= plan.utilityType === 'water' ? 'droplets' : 'zap' %>" width="20" height="20" style="color: var(--accent-blue);"></i>
+            <h3 style="margin: 0; display: flex; align-items: center; gap: 0.5rem; font-size: 1.15rem;">
+              <span style="text-transform: capitalize;"><%= plan.connectionType %></span>
+              <span class="badge badge--<%= plan.utilityType === 'water' ? 'info' : 'warning' %>" style="font-size: 0.7rem; border: none; background: rgba(0,0,0,0.05); color: var(--text-main);"><%= plan.utilityType %></span>
+            </h3>
+          </div>
+          <button type="button" class="btn btn--outline btn--sm tariff-edit-btn"
+                  data-plan="<%= plan._id %>"
+                  onclick="toggleEdit('<%= plan._id %>')">
+            <i data-lucide="edit-3" width="16" height="16"></i> Edit
+          </button>
+        </div>
+
+        <!-- Read-only view -->
+        <div class="tariff-card__view" id="view-<%= plan._id %>">
+          <div class="table-wrap" style="box-shadow: none; border: 1px solid var(--border-color); margin-bottom: 1.5rem;">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th style="padding: 0.75rem 1rem;">Min Units</th>
+                  <th style="padding: 0.75rem 1rem;">Max Units</th>
+                  <th style="padding: 0.75rem 1rem;">Rate / Unit</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% plan.slabs.forEach(slab => { %>
+                  <tr>
+                    <td style="padding: 0.75rem 1rem;"><%= slab.minUnits %></td>
+                    <td style="padding: 0.75rem 1rem;"><%= slab.maxUnits %></td>
+                    <td style="padding: 0.75rem 1rem; font-weight: 600; color: var(--text-main);">₹<%= slab.ratePerUnit %></td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; background: #f8fafc; padding: 1rem 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+            <div style="color: var(--text-muted); font-size: 0.95rem;">Fixed Charge:</div>
+            <div style="font-size: 1.25rem; font-weight: 700; color: var(--text-main);">₹<%= plan.fixedCharge %></div>
+          </div>
+
+          <% if (!plan.active) { %>
+            <div class="tariff-card__inactive" style="margin-top: 1rem;">
+              <span class="badge badge--danger" style="border: none;">Inactive</span>
+            </div>
+          <% } %>
+        </div>
+
+        <!-- Edit form (hidden by default) -->
+        <form action="/admin/tariffs/<%= plan._id %>" method="POST"
+              class="tariff-card__edit" id="edit-<%= plan._id %>" style="display:none;">
+
+          <div class="slab-editor" id="slabs-<%= plan._id %>">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+              <span style="font-weight: 600; color: var(--text-muted); text-transform: uppercase; font-size: 0.85rem;">Slabs</span>
+              <button type="button" class="btn btn--outline btn--sm"
+                      onclick="addSlabRow('<%= plan._id %>')"><i data-lucide="plus" width="14" height="14"></i> Add Slab</button>
+            </div>
+
+            <div class="slab-rows" id="slab-rows-<%= plan._id %>">
+              <% plan.slabs.forEach((slab, i) => { %>
+                <div class="slab-row" data-index="<%= i %>" style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem; align-items: flex-end; background: #f8fafc; padding: 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+                  <div class="form-group" style="margin-bottom: 0; flex: 1;">
+                    <label style="font-size: 0.75rem;">Min</label>
+                    <input type="number" name="slabs[<%= i %>][minUnits]" value="<%= slab.minUnits %>" min="0" required style="padding: 0.4rem 0.5rem; box-shadow: none;" />
+                  </div>
+                  <div class="form-group" style="margin-bottom: 0; flex: 1;">
+                    <label style="font-size: 0.75rem;">Max</label>
+                    <input type="number" name="slabs[<%= i %>][maxUnits]" value="<%= slab.maxUnits %>" min="0" required style="padding: 0.4rem 0.5rem; box-shadow: none;" />
+                  </div>
+                  <div class="form-group" style="margin-bottom: 0; flex: 1;">
+                    <label style="font-size: 0.75rem;">₹ / Unit</label>
+                    <input type="number" name="slabs[<%= i %>][ratePerUnit]" value="<%= slab.ratePerUnit %>" min="0" step="0.01" required style="padding: 0.4rem 0.5rem; box-shadow: none;" />
+                  </div>
+                  <button type="button" class="btn btn--outline btn--sm" onclick="removeSlabRow(this)" title="Remove slab" style="color: var(--status-danger); border-color: var(--status-danger); padding: 0.4rem;">
+                    <i data-lucide="trash-2" width="16" height="16"></i>
+                  </button>
+                </div>
+              <% }) %>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-top: 1.5rem; background: #f8fafc; padding: 1rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+            <label for="fixedCharge-<%= plan._id %>">Fixed Charge (₹)</label>
+            <input type="number" id="fixedCharge-<%= plan._id %>"
+                   name="fixedCharge" value="<%= plan.fixedCharge %>"
+                   min="0" step="0.01" required style="box-shadow: none;" />
+          </div>
+
+          <div class="form-actions" style="margin-top: 1.5rem; display: flex; gap: 1rem;">
+            <button type="submit" class="btn btn--primary" style="flex: 1;">Save Changes</button>
+            <button type="button" class="btn btn--outline" onclick="toggleEdit('<%= plan._id %>')" style="flex: 1;">Cancel</button>
+          </div>
+        </form>
+
+      </div>
+    <% } %>
+  <% }) %>
+
+</div>
+
+<% } %>
+
+<script>
+  /* Toggle between read-only view and edit form */
+  function toggleEdit(planId) {
+    const view = document.getElementById('view-' + planId);
+    const edit = document.getElementById('edit-' + planId);
+    const isEditing = edit.style.display !== 'none';
+
+    view.style.display = isEditing ? '' : 'none';
+    edit.style.display = isEditing ? 'none' : '';
+  }
+
+  /* Add a new empty slab row to a plan's editor */
+  function addSlabRow(planId) {
+    const container = document.getElementById('slab-rows-' + planId);
+    const rows = container.querySelectorAll('.slab-row');
+    const idx = rows.length;
+
+    // Pre-fill minUnits from previous slab's maxUnits + 1
+    let suggestedMin = 0;
+    if (rows.length > 0) {
+      const lastMax = rows[rows.length - 1].querySelector('input[name*="maxUnits"]');
+      if (lastMax && lastMax.value) suggestedMin = Number(lastMax.value) + 1;
+    }
+
+    const div = document.createElement('div');
+    div.className = 'slab-row';
+    div.dataset.index = idx;
+    div.style = "display: flex; gap: 0.5rem; margin-bottom: 0.5rem; align-items: flex-end; background: #f8fafc; padding: 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color);";
+    div.innerHTML = `
+      <div class="form-group" style="margin-bottom: 0; flex: 1;">
+        <label style="font-size: 0.75rem;">Min</label>
+        <input type="number" name="slabs[${idx}][minUnits]" value="${suggestedMin}" min="0" required style="padding: 0.4rem 0.5rem; box-shadow: none;" />
+      </div>
+      <div class="form-group" style="margin-bottom: 0; flex: 1;">
+        <label style="font-size: 0.75rem;">Max</label>
+        <input type="number" name="slabs[${idx}][maxUnits]" value="" min="0" required style="padding: 0.4rem 0.5rem; box-shadow: none;" />
+      </div>
+      <div class="form-group" style="margin-bottom: 0; flex: 1;">
+        <label style="font-size: 0.75rem;">₹ / Unit</label>
+        <input type="number" name="slabs[${idx}][ratePerUnit]" value="" min="0" step="0.01" required style="padding: 0.4rem 0.5rem; box-shadow: none;" />
+      </div>
+      <button type="button" class="btn btn--outline btn--sm" onclick="removeSlabRow(this)" title="Remove slab" style="color: var(--status-danger); border-color: var(--status-danger); padding: 0.4rem;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+      </button>
+    `;
+    container.appendChild(div);
+  }
+
+  /* Remove a slab row and re-index all remaining rows */
+  function removeSlabRow(btn) {
+    const row = btn.closest('.slab-row');
+    const container = row.parentElement;
+    row.remove();
+
+    // Re-index
+    container.querySelectorAll('.slab-row').forEach((r, i) => {
+      r.dataset.index = i;
+      r.querySelectorAll('input').forEach(input => {
+        const field = input.name.replace(/slabs\[\d+\]/, `slabs[${i}]`);
+        input.name = field;
+      });
+    });
+  }
+</script>
+
+<%- include('../../partials/admin-footer') %>

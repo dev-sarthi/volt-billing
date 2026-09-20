@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= typeof pageTitle !== 'undefined' ? pageTitle + ' — ' : '' %>Admin — VoltBilling</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/css/admin.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="admin-body">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar__brand">
+      <i data-lucide="droplet" width="22" height="22" style="color: var(--accent-blue);"></i>
+      <i data-lucide="zap" width="22" height="22" style="color: var(--accent-amber);"></i>
+      VoltBilling
+    </div>
+
+    <nav class="sidebar__nav">
+      <a href="/admin/dashboard"
+         class="sidebar__link<%= typeof activePage !== 'undefined' && activePage === 'dashboard' ? ' sidebar__link--active' : '' %>">
+        <i data-lucide="layout-dashboard" width="18" height="18"></i> Dashboard
+      </a>
+      <a href="/admin/consumers"
+         class="sidebar__link<%= typeof activePage !== 'undefined' && activePage === 'consumers' ? ' sidebar__link--active' : '' %>">
+        <i data-lucide="users" width="18" height="18"></i> Consumers
+      </a>
+      <a href="/admin/applications"
+         class="sidebar__link<%= typeof activePage !== 'undefined' && activePage === 'applications' ? ' sidebar__link--active' : '' %>">
+        <i data-lucide="file-check-2" width="18" height="18"></i> Applications
+      </a>
+      <a href="/admin/meters"
+         class="sidebar__link<%= typeof activePage !== 'undefined' && activePage === 'meters' ? ' sidebar__link--active' : '' %>">
+        <i data-lucide="gauge" width="18" height="18"></i> Meters
+      </a>
+      <a href="/admin/tariffs"
+         class="sidebar__link<%= typeof activePage !== 'undefined' && activePage === 'tariffs' ? ' sidebar__link--active' : '' %>">
+        <i data-lucide="coins" width="18" height="18"></i> Tariffs
+      </a>
+    </nav>
+  </aside>
+
+  <!-- Main wrapper -->
+  <div class="main-wrap">
+
+    <!-- Top bar -->
+    <header class="topbar">
+      <div class="topbar__title"><%= typeof pageTitle !== 'undefined' ? pageTitle : 'Admin Workspace' %></div>
+      <div class="topbar__user">
+        <span class="topbar__name">
+          <i data-lucide="shield-check" width="18" height="18" style="color: var(--status-success);"></i>
+          <%= typeof currentUserName !== 'undefined' && currentUserName ? currentUserName : 'Admin' %>
+        </span>
+        <form action="/logout" method="POST" class="topbar__logout-form">
+          <button type="submit" class="topbar__logout" title="Log Out">
+            <i data-lucide="log-out" width="20" height="20"></i>
+          </button>
+        </form>
+      </div>
+    </header>
+
+    <!-- Page content -->
+    <main class="content">
+      <%- include('../partials/flash') %>

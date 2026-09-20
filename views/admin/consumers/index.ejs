@@ -1,0 +1,111 @@
+<%- include('../../partials/admin-header') %>
+
+<div class="page-header">
+  <h2><i data-lucide="users" width="32" height="32" style="color: var(--accent-blue); margin-right: 0.5rem;"></i> All Consumers</h2>
+  <a href="/admin/consumers/new" class="btn btn--primary">
+    <i data-lucide="plus" width="18" height="18"></i> Add Consumer
+  </a>
+</div>
+
+<div class="toolbar">
+  <input
+    type="text"
+    class="search-box"
+    id="consumerSearch"
+    placeholder="Search by name, email, ID…"
+    value="<%= search %>"
+  />
+</div>
+
+<div class="table-wrap">
+  <% if (consumers.length === 0) { %>
+    <div class="empty" style="text-align: center; padding: 4rem 2rem; color: var(--text-muted);">
+      <i data-lucide="folder-open" width="48" height="48" style="margin-bottom: 1rem; opacity: 0.5;"></i>
+      <p>No consumers found. Add your first consumer above.</p>
+    </div>
+  <% } else { %>
+    <table class="data-table" id="consumersTable">
+      <thead>
+        <tr>
+          <th>Consumer ID</th>
+          <th>Name & Email</th>
+          <th>Type / Utility</th>
+          <th>Status</th>
+          <th>Meter</th>
+          <th>Financials</th>
+          <th style="text-align: right;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% consumers.forEach(c => { %>
+          <tr class="consumer-row">
+            <td style="font-family: monospace; font-size: 0.95rem; font-weight: 600;"><%= c.consumerId %></td>
+            <td>
+              <div style="font-weight: 600; color: var(--text-main);"><%= c.userId ? c.userId.name : '—' %></div>
+              <div style="font-size: 0.85rem; color: var(--text-muted);"><%= c.userId ? c.userId.email : '—' %></div>
+            </td>
+            <td>
+              <div style="display: flex; gap: 0.5rem; margin-bottom: 0.25rem;">
+                <span class="badge badge--<%= c.connectionType === 'commercial' ? 'warning' : 'primary' %>" style="border: none; background: rgba(0,0,0,0.05); color: var(--text-main);">
+                  <%= c.connectionType %>
+                </span>
+                <span class="badge badge--<%= c.utilityType === 'water' ? 'info' : 'warning' %>" style="border: none; background: rgba(0,0,0,0.05); color: var(--text-main);">
+                  <%= c.utilityType || 'electricity' %>
+                </span>
+              </div>
+            </td>
+            <td>
+              <span class="badge badge--<%= c.status === 'active' ? 'success' : (c.status === 'inactive' ? 'danger' : 'warning') %>" style="border: none;">
+                <%= c.status %>
+              </span>
+            </td>
+            <td style="font-family: monospace;"><%= c.meterNumber || 'Unassigned' %></td>
+            <td>
+              <div style="font-size: 0.85rem; margin-bottom: 0.25rem;">
+                <span style="color: var(--text-muted);">Paid:</span> <span style="color: var(--status-success); font-weight: 600;">₹<%= c.paidAmount || 0 %></span>
+              </div>
+              <div style="font-size: 0.85rem;">
+                <span style="color: var(--text-muted);">Dues:</span> <span style="<%= c.duesAmount > 0 ? 'color: var(--status-danger); font-weight: 600;' : 'color: var(--text-main); font-weight: 600;' %>">₹<%= c.duesAmount || 0 %></span>
+              </div>
+            </td>
+            <td style="text-align: right;">
+              <div class="actions" style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+                <a href="/admin/consumers/<%= c._id %>/edit" class="btn btn--outline btn--sm" title="Edit">
+                  <i data-lucide="edit" width="16" height="16"></i>
+                </a>
+                <% if (c.status === 'active') { %>
+                  <form action="/admin/consumers/<%= c._id %>/deactivate" method="POST" style="display:inline">
+                    <button type="submit" class="btn btn--outline btn--sm" style="color: var(--status-danger); border-color: var(--status-danger);"
+                            onclick="return confirm('Deactivate this consumer?')" title="Deactivate">
+                      <i data-lucide="power-off" width="16" height="16"></i>
+                    </button>
+                  </form>
+                <% } %>
+              </div>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  <% } %>
+</div>
+
+<script>
+  // Client-side text filter
+  const searchInput = document.getElementById('consumerSearch');
+  const rows = document.querySelectorAll('.consumer-row');
+
+  searchInput.addEventListener('input', () => {
+    const q = searchInput.value.toLowerCase();
+    rows.forEach(row => {
+      row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+    });
+  });
+
+  // Apply initial filter if search param was present
+  if (searchInput.value) {
+    searchInput.dispatchEvent(new Event('input'));
+  }
+</script>
+
+<%- include('../../partials/admin-footer') %>

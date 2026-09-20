@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= typeof pageTitle !== 'undefined' ? pageTitle + ' — ' : '' %>Reader — Billing System</title>
+  <link rel="stylesheet" href="/css/reader.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+  <!-- Top bar -->
+  <header class="topbar">
+    <div class="topbar__brand">
+      <i data-lucide="zap" width="20" height="20"></i> Billing
+    </div>
+    <div class="topbar__right">
+      <span class="topbar__name"><%= typeof currentUserName !== 'undefined' && currentUserName ? currentUserName : 'Reader' %></span>
+      <form action="/logout" method="POST" class="topbar__logout-form">
+        <button type="submit" class="topbar__logout"><i data-lucide="log-out" width="16" height="16"></i> Log Out</button>
+      </form>
+    </div>
+  </header>
+
+  <main class="page">
+    <%- include('../partials/flash') %>

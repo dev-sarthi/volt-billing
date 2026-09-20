@@ -1,0 +1,58 @@
+<%- include('../../partials/admin-header') %>
+
+<div class="page-header">
+  <h2>
+    <i data-lucide="user-cog" width="32" height="32" style="color: var(--accent-blue); margin-right: 0.5rem;"></i>
+    Edit Consumer — <span style="font-family: monospace; font-size: 1.5rem;"><%= consumer.consumerId %></span>
+  </h2>
+</div>
+
+<div class="bento-card" style="max-width: 800px; margin: 0 auto;">
+  <form action="/admin/consumers/<%= consumer._id %>" method="POST">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+      <!-- Read-only info -->
+      <div class="form-group">
+        <label>Name</label>
+        <input type="text" value="<%= consumer.userId ? consumer.userId.name : '' %>" disabled style="background: #f1f5f9; box-shadow: none; border-color: var(--border-color);" />
+      </div>
+
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" value="<%= consumer.userId ? consumer.userId.email : '' %>" disabled style="background: #f1f5f9; box-shadow: none; border-color: var(--border-color);" />
+      </div>
+
+      <!-- Editable fields -->
+      <div class="form-group">
+        <label for="connectionType">Connection Type</label>
+        <select id="connectionType" name="connectionType" required style="box-shadow: none;">
+          <option value="domestic" <%= consumer.connectionType === 'domestic' ? 'selected' : '' %>>Domestic</option>
+          <option value="commercial" <%= consumer.connectionType === 'commercial' ? 'selected' : '' %>>Commercial</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="utilityType">Utility Type</label>
+        <select id="utilityType" name="utilityType" required style="box-shadow: none;">
+          <option value="electricity" <%= consumer.utilityType === 'electricity' ? 'selected' : '' %>>Electricity</option>
+          <option value="water" <%= consumer.utilityType === 'water' ? 'selected' : '' %>>Water</option>
+        </select>
+      </div>
+
+      <div class="form-group" style="grid-column: span 2;">
+        <label for="address">Address</label>
+        <input type="text" id="address" name="address"
+               value="<%= consumer.address || '' %>"
+               placeholder="House / street / city" style="box-shadow: none;" />
+      </div>
+    </div>
+
+    <div class="form-actions" style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: flex-end;">
+      <a href="/admin/consumers" class="btn btn--outline">Cancel</a>
+      <button type="submit" class="btn btn--primary">
+        Save Changes <i data-lucide="save" width="16" height="16" style="margin-left: 0.5rem;"></i>
+      </button>
+    </div>
+  </form>
+</div>
+
+<%- include('../../partials/admin-footer') %>

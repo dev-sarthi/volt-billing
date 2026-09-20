@@ -1,0 +1,37 @@
+<%- include('../../partials/reader-header') %>
+
+<div class="reader-nav">
+  <a href="/reader/dashboard" class="reader-nav__link">
+    <i data-lucide="gauge" width="18" height="18"></i> Meters
+  </a>
+  <a href="/reader/readings" class="reader-nav__link reader-nav__link--active">
+    <i data-lucide="history" width="18" height="18"></i> History
+  </a>
+</div>
+
+<div class="section-header">
+  <h2><i data-lucide="check-circle" width="24" height="24" style="color: var(--accent-green);"></i> Past Submissions</h2>
+</div>
+
+<% if (readings.length === 0) { %>
+  <div class="empty">
+    <i data-lucide="file-x" width="48" height="48" style="margin-bottom: 0.5rem; opacity: 0.5;"></i>
+    <p>You haven't submitted any readings yet.</p>
+  </div>
+<% } else { %>
+  <div class="readings-list">
+    <% readings.forEach(r => { %>
+      <div class="reading-row">
+        <div class="reading-row__left">
+          <div class="reading-row__meter" style="font-family: monospace; font-size: 1.05rem;"><%= r.meterId ? r.meterId.meterNumber : 'Unknown Meter' %></div>
+          <div class="reading-row__month">
+            <i data-lucide="calendar" width="12" height="12"></i> <%= r.billingMonth %>
+          </div>
+        </div>
+        <div class="reading-row__units"><%= r.unitsConsumed %> units</div>
+      </div>
+    <% }) %>
+  </div>
+<% } %>
+
+<%- include('../../partials/reader-footer') %>

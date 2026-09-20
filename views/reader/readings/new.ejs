@@ -1,0 +1,61 @@
+<%- include('../../partials/reader-header') %>
+
+<div class="section-header">
+  <h2><i data-lucide="edit-3" width="24" height="24" style="color: var(--accent-blue);"></i> Enter Reading</h2>
+  <div class="meta" style="font-family: monospace; font-size: 1rem;"><i data-lucide="gauge" width="14" height="14" style="display: inline; vertical-align: -2px; margin-right: 2px;"></i> <%= meter.meterNumber %></div>
+</div>
+
+<div class="reading-card">
+  <div class="reading-card__context">
+    <div class="context-row">
+      <div class="context-row__label">Consumer</div>
+      <div class="context-row__value"><%= meter.consumerId && meter.consumerId.userId ? meter.consumerId.userId.name : 'Unknown' %></div>
+    </div>
+    <div class="context-row">
+      <div class="context-row__label">Billing Month</div>
+      <div class="context-row__value"><%= billingMonth %></div>
+    </div>
+    <div class="context-row">
+      <div class="context-row__label">Last Reading</div>
+      <div class="context-row__value context-row__value--highlight" style="display: flex; align-items: center; gap: 0.25rem;">
+        <% if (previousReading !== null) { %>
+          <i data-lucide="history" width="16" height="16"></i> <%= previousReading %> units
+        <% } else { %>
+          <i data-lucide="info" width="16" height="16"></i> First reading for this meter
+        <% } %>
+      </div>
+    </div>
+  </div>
+
+  <form action="/reader/readings" method="POST">
+    <input type="hidden" name="meterId" value="<%= meter._id %>" />
+
+    <% if (error) { %>
+      <div class="inline-error">
+        <i data-lucide="alert-circle" width="18" height="18"></i>
+        <%= error %>
+      </div>
+    <% } %>
+
+    <div class="form-group">
+      <label for="currentReading">Current Reading</label>
+      <input 
+        type="number" 
+        id="currentReading" 
+        name="currentReading" 
+        min="<%= previousReading !== null ? previousReading : 0 %>" 
+        value="<%= currentReadingValue %>"
+        placeholder="Enter units…" 
+        required 
+        autofocus
+      />
+    </div>
+
+    <button type="submit" class="btn btn--primary btn--block mt-1">
+      Submit Reading <i data-lucide="check-circle" width="18" height="18"></i>
+    </button>
+    <a href="/reader/dashboard" class="btn btn--outline btn--block mt-1" style="text-align: center;">Cancel</a>
+  </form>
+</div>
+
+<%- include('../../partials/reader-footer') %>
